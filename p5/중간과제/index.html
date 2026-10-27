@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원 연못 · 기록</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+</head>
+<body>
+  <main id="app">
+
+    <div id="topbar">
+      <div class="brand">
+        <div class="brand-mark">✳</div>
+        <div>
+          <div class="brand-title">소원 연못</div>
+          <div class="brand-subtitle" id="brandSubtitle">
+            작은 생각을 띄워두는 곳
+          </div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="allBtn" class="quiet-btn">
+          모든 기록 <span id="recordCount">0</span>
+        </button>
+        <span id="sync-status" class="sync-status" role="status">브라우저에만 저장</span>
+        <button id="newBtn" class="main-btn">＋ 기록 남기기</button>
+      </div>
+    </div>
+
+    <section id="canvas-wrap">
+      <div id="hint">
+        마음을 적고, 작은 물건에 담아 연못에 띄워보세요.
+      </div>
+
+      <div id="canvas-holder"></div>
+
+      <div id="bottom-note">
+        물결을 터치해 생각을 만나보세요
+      </div>
+    </section>
+
+    <div id="modal-backdrop" class="hidden">
+      <section id="modal" role="dialog" aria-modal="true">
+        <button id="closeModal" class="close-btn" aria-label="닫기">
+          ×
+        </button>
+        <div id="modal-content"></div>
+      </section>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+  </main>
+
+  <script src="cloud-config.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
