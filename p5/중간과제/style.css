@@ -193,7 +193,7 @@ button:active {
   z-index: 2;
   padding: 0 16px;
   text-align: center;
-  color: rgba(32, 59, 59, 0.56);
+  color: #173e5c;
   font-size: 9px;
   letter-spacing: 0.15em;
   pointer-events: none;
@@ -224,6 +224,7 @@ button:active {
   width: min(500px, 100%);
   max-height: min(86vh, 760px);
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 30px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 22px;
@@ -417,6 +418,7 @@ button:active {
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-width: 0;
   border: 1px solid #e0e6dc;
   border-radius: 13px;
   padding: 12px;
@@ -439,9 +441,11 @@ button:active {
 .record-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .record-name {
+  display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -450,6 +454,7 @@ button:active {
 }
 
 .record-preview {
+  display: block;
   margin-top: 4px;
   overflow: hidden;
   color: #82938b;
@@ -459,8 +464,12 @@ button:active {
 }
 
 .record-state {
+  min-width: 0;
+  overflow: hidden;
   color: #80968d;
   font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty-state {

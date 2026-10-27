@@ -21,7 +21,7 @@ let waterRipplePrevious = null;
 const TEXT = {
     floating:"수면", resting:"연못 아래", wishes:"소원은 이곳에 머뭅니다", count:"수면 {a}개 · 연못 아래 {b}개",
     boat:"종이배", leaf:"나뭇잎", coin:"동전", boatDesc:"일상 · 생각", leafDesc:"기분 · 순간", coinDesc:"소원 · 목표",
-    editEyebrow:"기록 수정", newEyebrow:"마음 띄우기", editTitle:"이 기록 수정하기", newTitle:"생각 하나 남기기", titleLabel:"제목", titlePlaceholder:"기억하기 쉬운 이름을 붙여주세요", contentLabel:"내용 *", contentPlaceholder:"어떤 생각을 남기고 싶나요?", choose:"연못에 띄울 물건 선택", cancel:"취소", save:"수정 저장", toss:"연못에 띄우기", writeFirst:"내용을 조금 적은 뒤 연못에 띄워주세요.", updated:"기록을 수정했어요.", tossed:"연못에 띄웠어요. 이 생각이 편안히 머물길.",
+    editEyebrow:"기록 수정", newEyebrow:"마음 띄우기", editTitle:"이 기록 수정하기", newTitle:"생각 하나 남기기", titleLabel:"제목", titlePlaceholder:"기억하기 쉬운 이름을 붙여주세요", contentLabel:"내용", contentPlaceholder:"어떤 생각을 남기고 싶나요?", choose:"연못에 띄울 물건 선택", cancel:"취소", save:"수정 저장", toss:"연못에 띄우기", writeFirst:"내용을 조금 적은 뒤 연못에 띄워주세요.", updated:"기록을 수정했어요.", tossed:"연못에 띄웠어요. 이 생각이 편안히 머물길.",
     surfaceRecord:"수면의 기록", bottomRecord:"연못 아래의 기록", created:"작성", modified:"최근 수정", edit:"수정", favorite:"☆ 즐겨찾기", favorited:"★ 즐겨찾기됨", retrieve:"수면으로 건져 올리기", sink:"연못 아래로 보내기", dissolve:"물에 녹여 보내기", putBack:"연못에 돌려놓기", addedFavorite:"즐겨찾기에 담았어요.", removedFavorite:"즐겨찾기에서 뺐어요.", sunk:"기록이 천천히 가라앉았어요.", retrieved:"기록을 수면으로 건져 올렸어요.", returned:"연못에 다시 띄웠어요.",
     letGo:"놓아주기", dissolveQuestion:"물속으로 녹여 보낼까요?", cannotUndo:"삭제한 기록은 되돌릴 수 없어요.", think:"조금 더 생각하기", confirmDissolve:"녹여 보내기", dissolved:"기록을 물에 녹여 보냈어요.", archive:"작은 기록 모음", allTitle:"모든 기록", allFilter:"전체", favoriteFilter:"★ 즐겨찾기", bottomFilter:"연못 아래", surfaceFilter:"수면", backPool:"연못으로 돌아가기", empty:"아직 기록이 없어요.<br>작은 생각 하나를 적어 연못에 띄워보세요.", stateBottom:"연못 아래", stateSurface:"수면"
 };
@@ -410,16 +410,15 @@ function drawRipples() {
 function drawPoolLabels() {
   fill(239, 245, 231, 210);
   textSize(max(10, pool.d * 0.024));
-  text(t("wishes"), pool.x, pool.y + pool.d * 0.2);
+  text(t("wishes"), pool.x, pool.y + pool.d * 0.24);
 
   const surfaceCount = notes.filter(n => n.state === "surface").length;
   const bottomCount = notes.filter(n => n.state === "bottom").length;
 
-  fill("#54746e");
+  fill("#173e5c");
   textSize(max(11, pool.d * 0.012));
 
-  // 数量统计向上移动，避免与页面底部提示重叠
-  const countY = min(height - 75, pool.y + pool.d * 0.44);
+  const countY = min(height - 40, pool.y + pool.d * 0.5);
 
   text(
     tr("count", {
