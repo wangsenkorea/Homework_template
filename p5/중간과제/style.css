@@ -1,0 +1,574 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --ink: #203b3b;
+  --muted: #728685;
+  --paper: #e7e9df;
+  --cream: #fffdf7;
+  --teal: #3b7775;
+  --teal-dark: #285b5b;
+  --line: #d8ded4;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, "Noto Sans KR", "Noto Sans SC",
+    "Malgun Gothic", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#canvas-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 50% 44%,
+      #f1f0e5 0%,
+      #e5e9df 60%,
+      #dce3d9 100%
+    );
+  pointer-events: none;
+}
+
+#canvas-holder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+#canvas-holder canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+/* 顶部界面 */
+
+#topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  padding: 22px 28px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  pointer-events: none;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(220, 232, 220, 0.88);
+  color: var(--teal-dark);
+  font-size: 23px;
+  box-shadow: 0 5px 16px rgba(37, 71, 63, 0.06);
+}
+
+.brand-title {
+  color: #254743;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.brand-subtitle {
+  margin-top: 4px;
+  color: #657e76;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  pointer-events: auto;
+}
+
+.sync-status {
+  color: #657e76;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.main-btn {
+  color: var(--cream);
+  background: var(--teal-dark);
+  box-shadow: 0 5px 16px rgba(26, 69, 65, 0.12);
+}
+
+.main-btn:hover {
+  background: #214c4c;
+}
+
+.quiet-btn {
+  color: var(--ink);
+  background: rgba(238, 240, 229, 0.92);
+}
+
+.quiet-btn span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 21px;
+  height: 21px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--cream);
+  font-size: 11px;
+}
+
+/* 提示文字 */
+
+#hint {
+  position: absolute;
+  top: 90px;
+  left: 30px;
+  z-index: 2;
+  max-width: 240px;
+  color: #526e69;
+  font-size: 12px;
+  line-height: 1.7;
+  pointer-events: none;
+}
+
+#bottom-note {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  z-index: 2;
+  padding: 0 16px;
+  text-align: center;
+  color: rgba(32, 59, 59, 0.56);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  pointer-events: none;
+}
+
+/* 弹窗 */
+
+#modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  padding: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 37, 37, 0.42);
+  backdrop-filter: blur(7px);
+  pointer-events: auto;
+}
+
+#modal-backdrop.hidden,
+.hidden {
+  display: none !important;
+}
+
+#modal {
+  position: relative;
+  z-index: 1001;
+  width: min(500px, 100%);
+  max-height: min(86vh, 760px);
+  overflow-y: auto;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 22px;
+  background: var(--cream);
+  box-shadow: 0 24px 80px rgba(17, 41, 39, 0.26);
+  pointer-events: auto;
+}
+
+#modal-content {
+  position: relative;
+  pointer-events: auto;
+}
+
+#modal-content * {
+  pointer-events: auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  padding: 4px 10px;
+  background: transparent;
+  color: #66807b;
+  font-size: 25px;
+}
+
+.modal-eyebrow {
+  margin: 0 0 8px;
+  color: #7c9690;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.modal-title {
+  margin: 0 28px 20px 0;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
+
+.field-label {
+  display: block;
+  margin: 17px 0 7px;
+  color: #617a75;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-field,
+.text-area {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 1px solid #dce3d9;
+  border-radius: 12px;
+  outline: none;
+  padding: 12px 13px;
+  color: var(--ink);
+  background: #fbfbf5;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  pointer-events: auto;
+}
+
+.text-field:focus,
+.text-area:focus {
+  border-color: #7ca7a0;
+  box-shadow: 0 0 0 3px rgba(85, 139, 130, 0.12);
+}
+
+.text-area {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+/* 纸船、树叶、硬币选择 */
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.type-option {
+  padding: 13px 6px 11px;
+  border: 1px solid #dce3d9;
+  border-radius: 14px;
+  background: #f7f7ef;
+  color: var(--ink);
+  text-align: center;
+}
+
+.type-option.selected {
+  border-color: #4e8880;
+  background: #e2eee4;
+  box-shadow: inset 0 0 0 1px #4e8880;
+}
+
+.type-emoji {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 25px;
+}
+
+.type-name {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.type-desc {
+  display: block;
+  margin-top: 4px;
+  color: #78908a;
+  font-size: 10px;
+}
+
+/* 弹窗按钮 */
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.modal-actions button {
+  flex: 1;
+  min-width: 100px;
+}
+
+.secondary-btn {
+  color: var(--ink);
+  background: #e9eee5;
+}
+
+.danger-btn {
+  color: #984e3d;
+  background: #f5e5df;
+}
+
+/* 记录详情 */
+
+.detail-content {
+  color: #425d58;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.detail-meta {
+  margin-top: 18px;
+  color: #8a9b93;
+  font-size: 11px;
+}
+
+/* 记录列表 */
+
+.list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 15px 0 16px;
+}
+
+.filter-btn {
+  padding: 8px 12px;
+  color: #536d67;
+  background: #edf0e7;
+  font-size: 12px;
+}
+
+.filter-btn.active {
+  color: white;
+  background: var(--teal-dark);
+}
+
+.record-list {
+  display: grid;
+  gap: 8px;
+}
+
+.record-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid #e0e6dc;
+  border-radius: 13px;
+  padding: 12px;
+  background: #fbfbf5;
+  color: var(--ink);
+  text-align: left;
+}
+
+.record-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #e6eee4;
+  font-size: 22px;
+}
+
+.record-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.record-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.record-preview {
+  margin-top: 4px;
+  overflow: hidden;
+  color: #82938b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+.record-state {
+  color: #80968d;
+  font-size: 10px;
+}
+
+.empty-state {
+  padding: 28px 10px;
+  color: #81948b;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* 提示消息 */
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 48px;
+  z-index: 2000;
+  transform: translateX(-50%);
+  max-width: calc(100% - 30px);
+  padding: 11px 17px;
+  border-radius: 999px;
+  color: white;
+  background: #244e4b;
+  font-size: 12px;
+  box-shadow: 0 8px 30px #193d3b33;
+  pointer-events: none;
+}
+
+/* 手机布局 */
+
+@media (max-width: 700px) {
+  #topbar {
+    padding: 13px 12px;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .brand {
+    gap: 7px;
+  }
+
+  .brand-mark {
+    width: 29px;
+    height: 29px;
+    font-size: 18px;
+  }
+
+  .brand-title {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .brand-subtitle {
+    max-width: 120px;
+    font-size: 9px;
+  }
+
+  .top-actions {
+    gap: 5px;
+  }
+
+  .sync-status {
+    position: absolute;
+    top: 68px;
+    right: 14px;
+    max-width: 120px;
+    text-align: right;
+    white-space: normal;
+    font-size: 8px;
+  }
+
+  .top-actions button {
+    padding: 9px 10px;
+    font-size: 10px;
+  }
+
+  #hint {
+    top: 125px;
+    left: 14px;
+    max-width: 185px;
+    font-size: 10px;
+  }
+
+  #modal {
+    padding: 26px 20px 22px;
+  }
+
+  .modal-title {
+    font-size: 22px;
+  }
+
+  #bottom-note {
+    bottom: 14px;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .type-grid {
+    gap: 6px;
+  }
+
+  .type-option {
+    padding: 10px 4px;
+  }
+}
