@@ -1,7 +1,7 @@
 // WISHING POOL MEMO
 // p5.js draws the wishing pool and its objects.
 // HTML/CSS handles text input and management panels.
-// Data is saved locally and can sync to a shared Supabase demo database.
+// Data is saved in this browser.
 
 let notes = [];
 let selectedType = "boat";
@@ -18,10 +18,6 @@ let dragOffset = null;
 let noteWasDragged = false;
 let waterDragPrevious = null;
 let waterRipplePrevious = null;
-let cloudReady = false;
-let cloudIds = new Set();
-let cloudSyncQueue = Promise.resolve();
-
 const TEXT = {
     floating:"수면", resting:"연못 아래", wishes:"소원은 이곳에 머뭅니다", count:"수면 {a}개 · 연못 아래 {b}개",
     boat:"종이배", leaf:"나뭇잎", coin:"동전", boatDesc:"일상 · 생각", leafDesc:"기분 · 순간", coinDesc:"소원 · 목표",
@@ -57,7 +53,6 @@ function setup() {
   textAlign(CENTER, CENTER);
 
   loadNotes();
-  initializeCloud();
 
   document.getElementById("newBtn").addEventListener("click", openCreateModal);
 
@@ -569,132 +564,11 @@ function loadNotes() {
 
 function saveNotes() {
   storeLocalNotes();
-  if (!cloudReady) return;
-
-  const snapshot = JSON.parse(JSON.stringify(notes));
-  cloudSyncQueue = cloudSyncQueue
-    .then(() => syncCloudSnapshot(snapshot))
-    .catch(error => {
-      console.error("Could not save memos to Supabase.", error);
-      setCloudStatus("클라우드 저장 실패");
-      showToast("클라우드 저장에 실패했어요. 연결을 확인해 주세요.");
-    });
 }
 
 function storeLocalNotes() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
   updateCount();
-}
-
-function setCloudStatus(message) {
-  const status = document.getElementById("sync-status");
-  if (status) status.textContent = message;
-}
-
-function getCloudConfig() {
-  const config = window.WISHING_POOL_SUPABASE;
-  if (!config || !config.url || !config.anonKey) return null;
-  return {
-    url: config.url.replace(/\/+$/, ""),
-    anonKey: config.anonKey
-  };
-}
-
-async function cloudRequest(config, path, options = {}) {
-  const response = await fetch(`${config.url}/rest/v1/wishing_pool_memos${path}`, {
-    ...options,
-    headers: {
-      apikey: config.anonKey,
-      ...(config.anonKey.startsWith("eyJ") ? { Authorization: `Bearer ${config.anonKey}` } : {}),
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers
-    }
-  });
-
-  if (!response.ok) {
-    const details = await response.text();
-    throw new Error(`Supabase request failed (${response.status}): ${details}`);
-  }
-
-  return response.status === 204 ? null : response.json();
-}
-
-async function syncCloudSnapshot(snapshot) {
-  const config = getCloudConfig();
-  if (!config) throw new Error("Supabase URL or anon key is not configured.");
-
-  const currentIds = new Set(snapshot.map(note => note.id));
-  if (snapshot.length) {
-    await cloudRequest(config, "?on_conflict=id", {
-      method: "POST",
-      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-      body: JSON.stringify(snapshot.map(note => ({ id: note.id, note })))
-    });
-  }
-
-  const removedIds = [...cloudIds].filter(id => !currentIds.has(id));
-  for (const id of removedIds) {
-    await cloudRequest(config, `?id=eq.${encodeURIComponent(id)}`, {
-      method: "DELETE",
-      headers: { Prefer: "return=minimal" }
-    });
-  }
-
-  cloudIds = currentIds;
-  setCloudStatus("클라우드에 저장됨");
-}
-
-async function initializeCloud() {
-  const config = getCloudConfig();
-  if (!config) {
-    setCloudStatus("브라우저에만 저장 · 클라우드 설정 필요");
-    return;
-  }
-
-  const newBtn = document.getElementById("newBtn");
-  const allBtn = document.getElementById("allBtn");
-  newBtn.disabled = true;
-  allBtn.disabled = true;
-  setCloudStatus("클라우드 연결 중...");
-
-  try {
-    const rows = await cloudRequest(config, "?select=id,note", {
-      headers: { Accept: "application/json" }
-    });
-    if (!Array.isArray(rows) || rows.some(row => !row.note || row.id !== row.note.id)) {
-      throw new Error("Supabase returned memo rows with an invalid shape.");
-    }
-
-    cloudIds = new Set(rows.map(row => row.id));
-    if (rows.length) {
-      notes = rows.map(row => row.note);
-      normalizeNotes();
-      storeLocalNotes();
-    } else if (notes.length) {
-      await syncCloudSnapshot(JSON.parse(JSON.stringify(notes)));
-    }
-
-    cloudReady = true;
-    setCloudStatus("클라우드에 저장됨");
-  } catch (error) {
-    console.error("Could not load memos from Supabase.", error);
-    setCloudStatus("클라우드 연결 실패 · 브라우저 저장 중");
-    showToast("클라우드에 연결하지 못했어요. 설정과 인터넷 연결을 확인해 주세요.");
-  } finally {
-    newBtn.disabled = false;
-    allBtn.disabled = false;
-    updateCount();
-  }
-}
-
-function normalizeNotes() {
-  notes.forEach((note, index) => {
-    if (!note.seed) note.seed = index * 13.7 + 2;
-    if (note.angle === undefined) note.angle = index * 2.399;
-    if (note.radial === undefined) note.radial = .25 + ((index * 37) % 60) / 100;
-    if (!note.state) note.state = "surface";
-    if (note.favorite === undefined) note.favorite = false;
-  });
 }
 
 function updateCount() {
